@@ -44,6 +44,10 @@ void UOptionWidgetBase::NativeConstruct()
     if (!GamepadDownImage)
         UE_LOG(LogStevesUI, Error, TEXT("%s should have a GamepadDownImage instance."), *this->GetClass()->GetName());
 
+    if (bDisableAtLimit && !GamepadUpImageDisabled)
+        UE_LOG(LogStevesUI, Error, TEXT("%s should have a GamepadUpImageDisabled instance."), *this->GetClass()->GetName());
+    if (bDisableAtLimit && !GamepadDownImageDisabled)
+        UE_LOG(LogStevesUI, Error, TEXT("%s should have a GamepadDownImageDisabled instance."), *this->GetClass()->GetName());
 
     SynchronizeProperties();
 
@@ -182,10 +186,31 @@ void UOptionWidgetBase::UpdateUpDownButtons()
 {
     const bool CanDecrease = SelectedIndex > 0;
     const bool CanIncrease = SelectedIndex < Options.Num() - 1;
-    if (MouseDownButton)
-        MouseDownButton->SetVisibility(CanDecrease ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-    if (MouseUpButton)
-        MouseUpButton->SetVisibility(CanIncrease ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+
+    if(bDisableAtLimit) {
+        if (MouseDownButton)
+            MouseDownButton->SetIsEnabled(CanDecrease);
+        if (MouseUpButton)
+            MouseUpButton->SetIsEnabled(CanIncrease);
+
+        if (GamepadDownImageDisabled)
+            GamepadDownImageDisabled->SetVisibility(CanDecrease ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+        if (GamepadUpImageDisabled)
+            GamepadUpImageDisabled->SetVisibility(CanIncrease ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+
+    } else {
+        if (MouseDownButton)
+            MouseDownButton->SetVisibility(CanDecrease ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+        if (MouseUpButton)
+            MouseUpButton->SetVisibility(CanIncrease ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+
+        // When DisableAtLimit is not set, we never want to show the Disabled images
+        if (GamepadDownImageDisabled)
+            GamepadDownImageDisabled->SetVisibility(ESlateVisibility::Hidden);
+        if (GamepadUpImageDisabled)
+            GamepadUpImageDisabled->SetVisibility(ESlateVisibility::Hidden);
+    }
+
     if (GamepadDownImage)
         GamepadDownImage->SetVisibility(CanDecrease ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
     if (GamepadUpImage)

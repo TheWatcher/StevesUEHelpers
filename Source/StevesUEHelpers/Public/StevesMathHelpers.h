@@ -190,4 +190,36 @@ public:
 	                                      TArray<FIntRect>& OutRects);
 
 	
+	/**
+	 * Project a convex 2D polygon onto an axis, e.g. for separating axis calculations
+	 * @param ConvexPoints Points on the convex polygon, anti-clockwise order
+	 * @param Axis Axis to project the points on to, should be normalised if you want min/max to be world units
+	 * @param OutMin Minimum projected point from all edges of the polygon
+	 * @param OutMax Maximum projected point from all edges of the polygon
+	 */
+	static void ProjectConvex2D(const TArray<FVector2f>& ConvexPoints,
+	                             const FVector2f& Axis,
+	                             float& OutMin,
+	                             float& OutMax);
+	/**
+	 * Get the centre of a convex polygon
+	 * @param ConvexPoints Points on the convex polygon, anti-clockwise order
+	 * @return The centre point in the same space
+	 */
+	static FVector2f GetConvexCentre2D(const TArray<FVector2f>& ConvexPoints);
+
+
+	/**
+	 * Calculate the overlapping area of 2 convex shapes in the same local space.
+	 * @param ConvexPointsA Points on the convex polygon, anti-clockwise order, in local space
+	 * @param ConvexPointsB Points on the convex polygon, anti-clockwise order, in local space
+	 * @param pOutMTV Pointer to the translation vector to apply to shape B to make the shapes no
+	 *     longer overlap (optional, can be null)
+	 * @return Whether these shapes were overlapping.
+	 */
+	static bool OverlapConvex2D(const TArray<FVector2f>& ConvexPointsA,
+	                             const TArray<FVector2f>& ConvexPointsB,
+	                             FVector2f* pOutMTV = nullptr);
+
+	
 };

@@ -319,7 +319,16 @@ bool StevesMathHelpers::OverlapConvex2D(const TArray<FVector2f>& ConvexPointsA,
 			// This is a valid separating axis, so these don't overlap
 			return false;
 		}
-
+		
+		// Check for one poly fully inside the other
+		if ((ProjMinA >= ProjMinB && ProjMaxA <= ProjMaxB) ||
+			(ProjMinB >= ProjMinA && ProjMaxB <= ProjMaxA))
+		{
+			const float MinDiff = FMath::Abs(ProjMinA - ProjMinB);
+			const float MaxDiff = FMath::Abs(ProjMaxA - ProjMaxB);
+			Overlap += FMath::Min(MinDiff, MaxDiff);
+		}
+		
 		// We can use the smallest overlap later to calculate MTV, if requested
 		if (Overlap < SmallestOverlap)
 		{

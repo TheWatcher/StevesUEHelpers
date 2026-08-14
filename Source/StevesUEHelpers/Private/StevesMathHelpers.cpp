@@ -268,12 +268,12 @@ void StevesMathHelpers::ProjectConvex2D(const TArray<FVector2f>& ConvexPoints, c
 
 FVector2f StevesMathHelpers::GetConvexCentre2D(const TArray<FVector2f>& ConvexPoints)
 {
-	FVector2f Ret;
+	FVector2f Ret = FVector2f::ZeroVector;
 	for (const auto& P : ConvexPoints)
 	{
 		Ret += P;
 	}
-	return Ret / Ret.Length();
+	return Ret / static_cast<float>(ConvexPoints.Num());
 }
 
 

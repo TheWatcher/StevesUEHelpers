@@ -290,16 +290,22 @@ bool StevesMathHelpers::OverlapConvex2D(const TArray<FVector2f>& ConvexPointsA,
 		const FVector2f& P1 = ConvexPointsA[i];
 		const FVector2f& P2 = ConvexPointsA[(i + 1) % ConvexPointsA.Num()];
 		FVector2f Edge = P2 - P1;
-		FVector2f Normal(-Edge.Y, Edge.X);
-		Normals.Add(Normal.GetSafeNormal());
+		FVector2f Normal = FVector2f(-Edge.Y, Edge.X).GetSafeNormal();
+		if (!Normal.IsNearlyZero())
+		{
+			Normals.Add(Normal);
+		}
 	}
 	for (int i = 0; i < ConvexPointsB.Num(); ++i)
 	{
 		const FVector2f& P1 = ConvexPointsB[i];
 		const FVector2f& P2 = ConvexPointsB[(i + 1) % ConvexPointsB.Num()];
 		FVector2f Edge = P2 - P1;
-		FVector2f Normal(-Edge.Y, Edge.X);
-		Normals.Add(Normal.GetSafeNormal());
+		FVector2f Normal = FVector2f(-Edge.Y, Edge.X).GetSafeNormal();
+		if (!Normal.IsNearlyZero())
+		{
+			Normals.Add(Normal);
+		}
 	}
 
 	float ProjMinA, ProjMaxA, ProjMinB, ProjMaxB;

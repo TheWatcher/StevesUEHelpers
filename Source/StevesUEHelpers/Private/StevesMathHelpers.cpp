@@ -363,4 +363,9 @@ bool StevesMathHelpers::OverlapConvex2D(const TArray<FVector2f>& ConvexPointsA,
 	return true;
 }
 
+float StevesMathHelpers::HeadingAngle2D(FVector2f Dir)
+{
+	return FMath::RadiansToDegrees(FMath::Atan2(Dir.Y, Dir.X));
+}
+
 

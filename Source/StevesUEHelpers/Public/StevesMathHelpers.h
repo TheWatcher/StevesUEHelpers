@@ -220,6 +220,14 @@ public:
 	static bool OverlapConvex2D(const TArray<FVector2f>& ConvexPointsA,
 	                             const TArray<FVector2f>& ConvexPointsB,
 	                             FVector2f* pOutMTV = nullptr);
-
 	
+	
+	/**
+	 * Gets the rotation required to take the UnitX axis to a given direction
+	 * @param Dir Normalised direction
+	 * @return Rotation angle in degrees
+	 */
+	static float HeadingAngle2D(FVector2f Dir);
+
+
 };

@@ -250,3 +250,122 @@ int StevesMathHelpers::Fill2DRegionWithRectangles(int StartX,
 	return RectCount;
 	
 }
+
+void StevesMathHelpers::ProjectConvex2D(const TArray<FVector2f>& ConvexPoints, const FVector2f& Axis,
+	float& OutMin, float& OutMax)
+{
+	
+	OutMin = FVector2f::DotProduct(ConvexPoints[0], Axis);
+	OutMax = OutMin;
+
+	for (int i = 1; i < ConvexPoints.Num(); ++i)
+	{
+		const float P = FVector2f::DotProduct(ConvexPoints[i], Axis);
+		OutMin = FMath::Min(OutMin, P);
+		OutMax = FMath::Max(OutMax, P);
+	}
+}
+
+FVector2f StevesMathHelpers::GetConvexCentre2D(const TArray<FVector2f>& ConvexPoints)
+{
+	FVector2f Ret = FVector2f::ZeroVector;
+	for (const auto& P : ConvexPoints)
+	{
+		Ret += P;
+	}
+	return Ret / static_cast<float>(ConvexPoints.Num());
+}
+
+
+bool StevesMathHelpers::OverlapConvex2D(const TArray<FVector2f>& ConvexPointsA,
+	const TArray<FVector2f>& ConvexPointsB,
+	FVector2f* pOutMTV)
+{
+	TArray<FVector2f> Normals;
+	Normals.Reserve(ConvexPointsA.Num() + ConvexPointsB.Num());
+
+	// Calculate face normals for both shapes 
+	for (int i = 0; i < ConvexPointsA.Num(); ++i)
+	{
+		const FVector2f& P1 = ConvexPointsA[i];
+		const FVector2f& P2 = ConvexPointsA[(i + 1) % ConvexPointsA.Num()];
+		FVector2f Edge = P2 - P1;
+		FVector2f Normal = FVector2f(-Edge.Y, Edge.X).GetSafeNormal();
+		if (!Normal.IsNearlyZero())
+		{
+			Normals.Add(Normal);
+		}
+	}
+	for (int i = 0; i < ConvexPointsB.Num(); ++i)
+	{
+		const FVector2f& P1 = ConvexPointsB[i];
+		const FVector2f& P2 = ConvexPointsB[(i + 1) % ConvexPointsB.Num()];
+		FVector2f Edge = P2 - P1;
+		FVector2f Normal = FVector2f(-Edge.Y, Edge.X).GetSafeNormal();
+		if (!Normal.IsNearlyZero())
+		{
+			Normals.Add(Normal);
+		}
+	}
+
+	float ProjMinA, ProjMaxA, ProjMinB, ProjMaxB;
+	float SmallestOverlap = UE_MAX_FLT;
+	FVector2f OverlapAxis = FVector2f::ZeroVector;
+	
+	// Test each face normal as a possible separating axis
+	for (const FVector2f& N : Normals)
+	{
+		ProjectConvex2D(ConvexPointsA, N, ProjMinA, ProjMaxA);
+		ProjectConvex2D(ConvexPointsB, N, ProjMinB, ProjMaxB);
+
+		float Overlap = FMath::Min(ProjMaxA, ProjMaxB) - FMath::Max(ProjMinA, ProjMinB);
+
+		if (Overlap < UE_SMALL_NUMBER)
+		{
+			// This is a valid separating axis, so these don't overlap
+			return false;
+		}
+		
+		// Check for one poly fully inside the other
+		if ((ProjMinA >= ProjMinB && ProjMaxA <= ProjMaxB) ||
+			(ProjMinB >= ProjMinA && ProjMaxB <= ProjMaxA))
+		{
+			const float MinDiff = FMath::Abs(ProjMinA - ProjMinB);
+			const float MaxDiff = FMath::Abs(ProjMaxA - ProjMaxB);
+			Overlap += FMath::Min(MinDiff, MaxDiff);
+		}
+		
+		// We can use the smallest overlap later to calculate MTV, if requested
+		if (Overlap < SmallestOverlap)
+		{
+			// Deal with small negatives from the epsilon test
+			SmallestOverlap = FMath::Max(0, Overlap);
+			OverlapAxis = N;
+		}
+	}
+	
+	// If we got here there was no separating axis
+	if (pOutMTV)
+	{
+		// In order to calculate which direction to push shape B, we need to know their relative
+		// positions along the axis
+		FVector2f CentreA = GetConvexCentre2D(ConvexPointsA);
+		FVector2f CentreB = GetConvexCentre2D(ConvexPointsB);
+
+		if (FVector2f::DotProduct(CentreB - CentreA, OverlapAxis) < 0)
+		{
+			OverlapAxis *= -1.0f;
+		}
+		
+		// This is the movement of B so +ve
+		*pOutMTV = OverlapAxis * SmallestOverlap;
+	}
+	return true;
+}
+
+float StevesMathHelpers::HeadingAngle2D(FVector2f Dir)
+{
+	return FMath::RadiansToDegrees(FMath::Atan2(Dir.Y, Dir.X));
+}
+
+

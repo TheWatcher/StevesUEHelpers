@@ -51,10 +51,10 @@ public:
     TObjectPtr<UImage> GamepadDownImage;    
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    TObjectPtr<UImage> GamepadUpImageDisabled;
+    TObjectPtr<UImage> GamepadUpDisabledImage;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
-    TObjectPtr<UImage> GamepadDownImageDisabled;
+    TObjectPtr<UImage> GamepadDownDisabledImage;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (BindWidget), Category="OptionWidget")
     TObjectPtr<UTextBlock> GamepadText;
@@ -108,7 +108,7 @@ protected:
 
     /// Whether this option widget should set the up/down widgets to disabled at
     /// the end of the range
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Behavior")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="OptionWidget")
     bool bDisableAtLimit = false;
 
     UFUNCTION(BlueprintCallable, Category="OptionWidget")

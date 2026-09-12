@@ -107,7 +107,7 @@ protected:
     int SelectedIndex;
 
     /// Whether this option widget should set the up/down widgets to disabled at
-    /// the end of the range
+    /// the end of the range instead of hiding them as is the default.
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="OptionWidget")
     bool bDisableAtLimit = false;
 

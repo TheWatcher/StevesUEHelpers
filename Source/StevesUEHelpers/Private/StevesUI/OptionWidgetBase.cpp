@@ -44,10 +44,11 @@ void UOptionWidgetBase::NativeConstruct()
     if (!GamepadDownImage)
         UE_LOG(LogStevesUI, Error, TEXT("%s should have a GamepadDownImage instance."), *this->GetClass()->GetName());
 
+	// Log the absence of disabled gamepad images, rather than showing an error
     if (bDisableAtLimit && !GamepadUpDisabledImage)
-        UE_LOG(LogStevesUI, Error, TEXT("%s should have a GamepadUpDisabledImage instance."), *this->GetClass()->GetName());
+        UE_LOG(LogStevesUI, Log, TEXT("%s does not have a GamepadUpDisabledImage instance."), *this->GetClass()->GetName());
     if (bDisableAtLimit && !GamepadDownDisabledImage)
-        UE_LOG(LogStevesUI, Error, TEXT("%s should have a GamepadDownDisabledImage instance."), *this->GetClass()->GetName());
+        UE_LOG(LogStevesUI, Log, TEXT("%s does not have a GamepadDownDisabledImage instance."), *this->GetClass()->GetName());
 
     SynchronizeProperties();
 
